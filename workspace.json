@@ -14,16 +14,19 @@
             "outputPath": "dist/apps/next-app"
           }
         },
-        "serve": {
-          "builder": "@nrwl/next:dev-server",
+        "build-dev": {
+          "builder": "@nrwl/node:build",
           "options": {
-            "buildTarget": "next-app:build",
-            "dev": true
-          },
-          "configurations": {
-            "production": {
-              "dev": false
-            }
+            "outputPath": "dist/apps/next-app",
+            "main": "apps/next-app/main",
+            "tsConfig": "apps/next-app/tsconfig.app.json",
+            "assets": ["apps/next-app/static"]
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "next-app:build-dev"
           }
         },
         "export": {
