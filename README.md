@@ -1,4 +1,12 @@
-# NxWorkspace
+# Changes for Nx/Next
+
+- For `nx serve`, you need to use customize the **workspace.json**.
+- Use the `@nrwl/node:execute` builder rather than `@nrwl/next:dev-server` with a custom buildTarget.
+  https://github.com/bbasinsk/nx-next-custom-server/blob/7cb5c5c45c3ea6e66d0bb78cf4badf0f83259c9c/workspace.json#L17-L31
+- Make sure to check to not use the `@zeit/next-css` plugin when building with `@nrwl/next:build`.
+  https://github.com/bbasinsk/nx-next-custom-server/blob/7cb5c5c45c3ea6e66d0bb78cf4badf0f83259c9c/apps/next-app/next.config.js#L10-L13
+
+## NxWorkspace
 
 This project was generated using [Nx](https://nx.dev).
 

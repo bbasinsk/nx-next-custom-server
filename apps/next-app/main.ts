@@ -1,7 +1,7 @@
-const conf = require('./next.config.js').default;
-
 import express from 'express';
 import next from 'next';
+
+const conf = require('./next.config.js').default;
 
 const APP_DIR = 'apps/next-app';
 const port = parseInt(process.env.PORT, 10) || 4200;
