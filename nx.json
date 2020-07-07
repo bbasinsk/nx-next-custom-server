@@ -13,6 +13,9 @@
     },
     "next-app-e2e": {
       "tags": []
+    },
+    "utils": {
+      "tags": []
     }
   }
 }
