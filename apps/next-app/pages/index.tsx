@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { logger } from '@nx-workspace/utils'
 
 import './index.css';
 
 export const Index = () => {
+  useEffect(() => {
+    logger()
+  }, [])
+
   /*
    * Replace the elements below with your own.
    *
