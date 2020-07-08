@@ -1,17 +1,51 @@
-const path = require("path")
-const withPlugins = require("next-compose-plugins");
 const withCSS = require('@zeit/next-css');
-const withTM = require('next-transpile-modules')(['@nx-workspace/utils']);
+
+const internalNodeModulesRegExp = /@nx-workspace(?!.*node_modules)/
+const externalNodeModulesRegExp = /node_modules(?!\/@nx-workspace(?!.*node_modules))/;
 
 const { PHASE_PRODUCTION_BUILD } = require('next/constants');
 
 module.exports = (phase, { defaultConfig = defaultConfig }) => {
   let config = {
-    webpack: (config) => {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        '@nx-workspace/utils': path.resolve(__dirname, '../../libs/utils/src/index.ts')
-      }
+    webpack: (config, { defaultLoaders, dir }) => {
+      config.resolve.symlinks = false;
+
+      config.externals = config.externals && config.externals.map(external => {
+        if (typeof external !== 'function') return external;
+        return (ctx, req, cb) =>
+          internalNodeModulesRegExp.test(req) ? cb() : external(ctx, req, cb);
+      });
+
+      config.module.rules.push({
+        test: /\.+(js|jsx)$/,
+        loader: defaultLoaders.babel,
+        include: [internalNodeModulesRegExp]
+      });
+
+      config.module.rules = config.module.rules.map(
+        r =>
+          String(r.test) === String(/\.(ts|tsx)$/)
+            ? {
+              test: /\.(ts|tsx)$/,
+              include: [dir, internalNodeModulesRegExp],
+              exclude: externalNodeModulesRegExp,
+              use: [
+                defaultLoaders.babel,
+                {
+                  loader: "ts-loader",
+                  options: Object.assign(
+                    {},
+                    {
+                      transpileOnly: true
+                    },
+                    config.typescriptLoaderOptions
+                  )
+                }
+              ]
+            }
+            : r
+        );
+
       return config
     }
     // add config stuffs here
@@ -19,7 +53,7 @@ module.exports = (phase, { defaultConfig = defaultConfig }) => {
 
   if (phase !== PHASE_PRODUCTION_BUILD) {
     // add css, less, sass, and stylus loaders
-    config = withPlugins([withCSS, withTM], config);
+    config = withCSS(config);
   }
 
   return config;
